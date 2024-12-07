@@ -10,13 +10,18 @@ const PORT = 3200;
 // Creat a redis client
 const redisClient = 
 redis.createClient({
-	url: 'redis://localhost:6379',
+	 host: process.env.REDIS_HOST || 'localhost',
+ 	 port: process.env.REDIS_PORT || 6379,
 });
 
 // Connect to Redis
-redisClient.connect()
-	.then(() => console.log('Connected to redis'))
-	.catch((err) => console.error('Redis connection error', err));
+redisClient.on('connect', () => {
+  console.log('Connected to Redis');
+});
+
+redisClient.on('error', (err) => {
+  console.log('Redis connection error:', err);
+});
 
 // Define a route that sets and gets a value from Redis 
 app.get('/', async (req, res) => {
@@ -37,3 +42,4 @@ app.get('/', async (req, res) => {
 app.listen(PORT, () => {
 	console.log(`Server is running on http://localhost:${PORT}`);
 });
+
